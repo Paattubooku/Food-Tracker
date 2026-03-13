@@ -1,5 +1,6 @@
-import { NavLink, Outlet } from 'react-router-dom';
-import { LayoutDashboard, History, Scale, Lightbulb, Settings, Utensils } from 'lucide-react';
+import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { LayoutDashboard, History, Scale, Lightbulb, Settings, Utensils, LogOut } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
 
 const navItems = [
   { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
@@ -10,6 +11,14 @@ const navItems = [
 ];
 
 export default function Layout() {
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/login');
+  };
+
   return (
     <div className="flex min-h-screen" style={{ background: 'var(--color-background)' }}>
 
@@ -25,7 +34,7 @@ export default function Layout() {
         </div>
 
         {/* Nav */}
-        <nav className="flex-1 py-4 px-2 lg:px-3 space-y-0.5 overflow-y-auto">
+        <nav className="flex-1 py-4 px-2 lg:px-3 space-y-0.5 overflow-y-auto scrollbar-hide">
           {navItems.map(({ to, icon: Icon, label }) => (
             <NavLink
               key={to}
@@ -47,12 +56,23 @@ export default function Layout() {
 
         {/* User */}
         <div className="p-3 lg:p-4 border-t border-slate-800">
-          <div className="flex items-center gap-3 justify-center lg:justify-start">
-            <div className="w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center text-sm font-bold shrink-0">A</div>
-            <div className="min-w-0 hidden lg:block">
-              <p className="text-sm font-medium truncate">Alex Demo</p>
-              <p className="text-xs text-slate-400">Demo Account</p>
+          <div className="flex items-center gap-3 justify-center lg:justify-between">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center text-sm font-bold shrink-0 uppercase">
+                {user?.email?.[0] || 'U'}
+              </div>
+              <div className="min-w-0 hidden lg:block">
+                <p className="text-sm font-medium truncate">{user?.email?.split('@')[0]}</p>
+                <p className="text-[10px] text-slate-400 truncate">{user?.email}</p>
+              </div>
             </div>
+            <button 
+              onClick={handleSignOut}
+              className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors hidden lg:block"
+              title="Sign Out"
+            >
+              <LogOut className="w-4 h-4" />
+            </button>
           </div>
         </div>
       </aside>

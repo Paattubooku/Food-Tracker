@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { X, Plus, Loader2, Search, Check, Camera } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
 
 const MEAL_TYPES = ['breakfast', 'lunch', 'dinner', 'snack', 'other'];
 
@@ -48,6 +49,8 @@ export default function LogMealModal({ initialFood, onClose, onSaved }: Props) {
   const [fetchingNutrition, setFetchingNutrition] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const { authorizedFetch } = useAuth();
+
   useEffect(() => {
     if (initialFood) {
       const n = calcNutrition(initialFood, initialFood.default_serving_g);
@@ -71,7 +74,7 @@ export default function LogMealModal({ initialFood, onClose, onSaved }: Props) {
     searchTimer.current = setTimeout(async () => {
       setSearching(true);
       try {
-        const res = await fetch(`/api/foods?limit=5&q=${encodeURIComponent(query)}`).then(r => r.json());
+        const res = await authorizedFetch(`/api/foods?limit=5&q=${encodeURIComponent(query)}`).then(r => r.json());
         setResults(res.items || []);
       } finally { setSearching(false); }
     }, 400);
@@ -143,7 +146,7 @@ export default function LogMealModal({ initialFood, onClose, onSaved }: Props) {
       const { base64, mimeType } = await base64Promise;
 
       // 2. Send to API
-      const res = await fetch('/api/analyze-image', {
+      const res = await authorizedFetch('/api/analyze-image', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ imageBase64: base64, mimeType }),
@@ -181,7 +184,7 @@ export default function LogMealModal({ initialFood, onClose, onSaved }: Props) {
     setError('');
     setFetchingNutrition(true);
     try {
-      const res = await fetch('/api/estimate-nutrition', {
+      const res = await authorizedFetch('/api/estimate-nutrition', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ food_name: foodName, weight_g: pendingAIFood.weight_g }),
@@ -230,7 +233,7 @@ export default function LogMealModal({ initialFood, onClose, onSaved }: Props) {
         total_fat: acc.total_fat + it.fat_g,
       }), { total_calories: 0, total_protein: 0, total_carbs: 0, total_fat: 0 });
 
-      const res = await fetch('/api/meals', {
+      const res = await authorizedFetch('/api/meals', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ meal_type: mealType, ...totals, input_type: 'text', items: parsedItems }),

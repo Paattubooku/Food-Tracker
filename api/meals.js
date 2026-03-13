@@ -1,14 +1,15 @@
 import supabase from './_supabase.js';
-
-const DEMO_USER_ID = 'a1b2c3d4-e5f6-7890-abcd-ef1234567890';
+import { getUserId } from './_auth.js';
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   if (req.method === 'OPTIONS') return res.status(204).end();
 
   try {
+    const userId = await getUserId(req);
+
     if (req.method === 'GET') {
       const page = Math.max(1, parseInt(req.query.page || '1', 10));
       const limit = Math.min(50, parseInt(req.query.limit || '10', 10));
@@ -19,7 +20,7 @@ export default async function handler(req, res) {
       let query = supabase
         .from('meals')
         .select('*', { count: 'exact' })
-        .eq('user_id', DEMO_USER_ID)
+        .eq('user_id', userId)
         .order('logged_at', { ascending: false });
 
       if (date) {
@@ -50,7 +51,7 @@ export default async function handler(req, res) {
       const { data: meal, error: mealError } = await supabase
         .from('meals')
         .insert({
-          user_id: DEMO_USER_ID,
+          user_id: userId,
           meal_type: meal_type || 'other',
           total_calories: total_calories || 0,
           total_protein: total_protein || 0,
@@ -90,7 +91,7 @@ export default async function handler(req, res) {
         .from('meals')
         .update({ total_calories, total_protein, total_carbs, total_fat, health_score, is_corrected })
         .eq('id', id)
-        .eq('user_id', DEMO_USER_ID)
+        .eq('user_id', userId)
         .select()
         .single();
       if (mealError) throw mealError;
@@ -119,7 +120,7 @@ export default async function handler(req, res) {
       const { id } = req.body;
       if (!id) return res.status(400).json({ error: 'id required' });
       await supabase.from('meal_items').delete().eq('meal_id', id);
-      const { error } = await supabase.from('meals').delete().eq('id', id).eq('user_id', DEMO_USER_ID);
+      const { error } = await supabase.from('meals').delete().eq('id', id).eq('user_id', userId);
       if (error) throw error;
       return res.status(200).json({ ok: true });
     }
