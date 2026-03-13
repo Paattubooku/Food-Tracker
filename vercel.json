@@ -1,0 +1,20 @@
+{
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/$1"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ],
+  "env": {
+    "NEXT_PUBLIC_SUPABASE_URL": "https://otgopumbastbjnkhikjd.supabase.co",
+    "NEXT_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im90Z29wdW1iYXN0Ympua2hpa2pkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA2Njg0OTEsImV4cCI6MjA4NjI0NDQ5MX0.r5caijAVxQ_2_k_zrcIB-LoW6b1joQn0YKu8BsTxJwY",
+    "SUPABASE_SERVICE_ROLE_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im90Z29wdW1iYXN0Ympua2hpa2pkIiwicm9sZSI6ImFwcF9mc18xYjhmYTkwMy1hNTEzLTRlOTItOWY2NS1lNjdiNTJhYzIzMTJfYWdlbnRfMSIsImlhdCI6MTc3MzE4MDkzMCwiZXhwIjoyMDg4NTQwOTMwfQ.eOjY2c9YYk2qaegqmWKRMTScbRWUELs7d2335akJLMg",
+    "SUPABASE_DB_SCHEMA": "fs_1b8fa903-a513-4e92-9f65-e67b52ac2312_agent_1"
+  }
+}
